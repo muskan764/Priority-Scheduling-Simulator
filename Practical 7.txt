@@ -1,0 +1,51 @@
+# Function to calculate waiting time
+def calculate_waiting_time(processes, n, burst_time, priority, waiting_time):
+    # Sort processes based on priority (lower number = higher priority)
+    processes.sort(key=lambda x: x[2])  # Sort by priority
+
+    # The first process in the sorted list has no waiting time
+    waiting_time[processes[0][0]] = 0  # Set waiting time for the first process
+
+    # Calculate waiting time for remaining processes
+    for i in range(1, n):
+        # Waiting time of current process = burst time of previous processes + waiting time of previous process
+        waiting_time[processes[i][0]] = waiting_time[processes[i - 1][0]] + burst_time[processes[i - 1][0]]
+
+# Function to calculate turnaround time
+def calculate_turnaround_time(n, burst_time, waiting_time, turnaround_time):
+    for i in range(n):
+        turnaround_time[i] = burst_time[i] + waiting_time[i]
+
+# Function to display average waiting and turnaround times and process order
+def find_avg_time_priority(processes, n, burst_time, priority):
+    waiting_time = [0] * n
+    turnaround_time = [0] * n
+
+    # Calculate waiting time using priority scheduling
+    calculate_waiting_time(processes, n, burst_time, priority, waiting_time)
+    calculate_turnaround_time(n, burst_time, waiting_time, turnaround_time)
+
+    # Display process information
+    print("Process\tPriority\tBurst Time\tWaiting Time\tTurnaround Time")
+    total_waiting_time = 0
+    total_turnaround_time = 0
+    for i in range(n):
+        pid = processes[i][0]
+        total_waiting_time += waiting_time[pid]
+        total_turnaround_time += turnaround_time[pid]
+        print(f"{pid}\t\t{priority[pid]}\t\t{burst_time[pid]}\t\t{waiting_time[pid]}\t\t{turnaround_time[pid]}")
+
+    print(f"\nAverage Waiting Time: {total_waiting_time / n:.2f}")
+    print(f"Average Turnaround Time: {total_turnaround_time / n:.2f}")
+
+# Input: List of process IDs, burst times, and priorities
+process_ids = [0, 1, 2, 3]
+burst_time = [10, 1, 2, 1]  # Burst time for each process
+priority = [3, 1, 4, 2]     # Priority for each process (lower is higher priority)
+n = len(process_ids)
+
+# Create list of processes with (process ID, burst time, priority)
+processes = [(i, burst_time[i], priority[i]) for i in range(n)]
+
+# Find and display average times
+find_avg_time_priority(processes, n, burst_time, priority)
